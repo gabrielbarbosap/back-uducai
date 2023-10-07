@@ -18,6 +18,10 @@ const configuration = new Configuration({
 });
 const openai = new OpenAIApi(configuration);
 
+app.get("/", async (req, res) => {
+  res.status(200).json({ text: "Invalid prompt provided." });
+});
+
 // OK
 app.get("/resumo", async (req, res) => {
   req.body.prompt = "string";
@@ -287,7 +291,7 @@ app.get("/topicos", async (req, res) => {
 
 // OK
 app.post("/resposta", async (req, res) => {
-  console.log(req.body.prompt)
+  console.log(req.body.prompt);
   if (typeof req.body.prompt === "string") {
     const response = await openai.createCompletion({
       model: "text-davinci-003",
