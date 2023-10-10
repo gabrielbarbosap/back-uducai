@@ -42,6 +42,83 @@ app.post("/resumo", async (req, res) => {
   }
 });
 
+app.post("/pergunta-enem", async (req, res) => {
+  req.body.prompt = "string";
+
+  if (typeof req.body.prompt === "string") {
+    const response = await openai.createCompletion({
+      model: "text-davinci-003",
+      prompt: `Desenvolva uma pergunta de múltipla escolha, no estilo do ENEM com alta dificuldade, sobre ${req.body.theme}. Certifique-se de que a pergunta seja desafiadora, com alternativas bem elaboradas, incluindo a alternativa correta. Lembre-se de não me informar a resposta correta no final.`,
+
+      temperature: 0.3,
+      max_tokens: 2048,
+    });
+
+    return res.status(200).json({ text: response.data.choices[0].text });
+  } else {
+    res.status(200).json({ text: "Invalid prompt provided." });
+  }
+});
+
+app.post("/resposta-enem", async (req, res) => {
+  req.body.prompt = "string";
+
+  if (typeof req.body.prompt === "string") {
+    const response = await openai.createCompletion({
+      model: "text-davinci-003",
+      prompt: `${req.body.question}
+      
+      a resposta correta para essa pergunta é a letra ${req.body.resp}? se nao for me explique o motivo da correta`,
+      temperature: 0.3,
+      max_tokens: 2048,
+    });
+
+    return res.status(200).json({ text: response.data.choices[0].text });
+  } else {
+    res.status(200).json({ text: "Invalid prompt provided." });
+  }
+});
+
+app.post("/corretor-redacao", async (req, res) => {
+  if (typeof req.body.prompt === "string") {
+    const response = await openai.createCompletion({
+      model: "text-davinci-003",
+      prompt: `Você é um corretor do ENEM e deve fazer a correção da prova de redação
+      do ENEM considerando cinco competências
+      
+      1. Domínio da norma padrão da língua escrita
+      
+      2. Compreensão da proposta de redação e aplicação de conceitos 
+      das várias áreas do conhecimento para o desenvolvimento do tema 
+      nos limites estruturais do texto dissertativo-argumentativo
+      
+      3. Capacidade de selecionar, relacionar, organizar e interpretar 
+      informações, fatos, opiniões e argumentos em defesa de um ponto 
+      de vista
+      
+      4. Conhecimento dos mecanismos linguísticos necessários à 
+      construção da argumentação
+      
+      5. Elaboração de proposta de intervenção para o problema 
+      abordado, respeitados os direitos humanos.
+      
+      A pontuação atribuída a cada competência pode variar até 200 pontos. 
+      A nota máxima da redação é de mil pontos. 
+      
+      Com esses critérios, faça a correção da redação abaixo e 
+      apresente os resultados, seja breve: 
+      
+      ${req.body.prompt}`,
+      temperature: 0.1,
+      max_tokens: 2048,
+    });
+
+    return res.status(200).json({ text: response.data.choices[0].text });
+  } else {
+    res.status(200).json({ text: "Invalid prompt provided." });
+  }
+});
+
 // OK
 app.post("/caracteristica", async (req, res) => {
   req.body.prompt = "string";
@@ -102,6 +179,22 @@ app.post("/cronograma-professor", async (req, res) => {
     const response = await openai.createCompletion({
       model: "text-davinci-003",
       prompt: `olá, ChatGPT! se comporte como um especialista em criar roteiro de aulas. Levando em consideração a matéria, tema a ser abordado, aulas que o professor terá para abordar o assunto. Aqui estão as informações necessárias :Matéria: ${req.body.subject}, Tema: ${req.body.theme}, Quantidade de aulas para abordar o tema: ${req.body.days}. Estrutura do roteiro: O roteiro deve ser detalhado de forma eficaz para o professor entender o que ele deverá abordar em cada dia de aula. Cada tópico principal deve ser acompanhado por 1 a 4 subtópicos. Quanto mais relevante e extenso for o tema, mais subtópicos podem ser incluídos.`,
+      temperature: 0.4,
+      max_tokens: 2048,
+    });
+    return res.status(200).json({ text: response.data.choices[0].text });
+  } else {
+    res.status(200).json({ text: "Invalid prompt provided." });
+  }
+});
+
+app.post("/cronograma-professor-detalhado", async (req, res) => {
+  req.body.prompt = "string";
+
+  if (typeof req.body.prompt === "string") {
+    const response = await openai.createCompletion({
+      model: "text-davinci-003",
+      prompt: `${req.body.aula}, seja coerente com o tempo de aula(isso é fundamental, cada hora de aula equivale a 60 minutos)`,
       temperature: 0.4,
       max_tokens: 2048,
     });
